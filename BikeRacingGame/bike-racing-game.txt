@@ -1,0 +1,19 @@
+how to find out who finishes the race -> cyclic barier 
+making sure that all the threads should start at the same point -> countdown latch
+reusing threads and not init our own threads -> executor
+
+make a bike racing game 
+-> ask you to enter 10 bikers name 
+-> ask you to enter the distance coverage in kms
+-> display every 100 mts coverage the name of biker
+-> the speed should vary for every biker dynamically 
+-> display the final dashboard with the rankings, start time, end time, time taken 
+
+Rahul covered 100mrts.
+Sam covered 100mrts.
+Johm covered 200mrts..
+
+-> all the bikes must be ready but waiting for the countdown 
+-> all bikes must run at a time after the countdown reaches to 0
+-> in dashboard all the start time, end time and time taken must be displayed (All start time must be same)
+
