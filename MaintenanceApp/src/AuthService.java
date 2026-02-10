@@ -1,14 +1,14 @@
 import java.sql.*;
 
 class AuthService {
+    private static Connection con = DBConnection.getConnection();
     public static User Login(String name, String password) throws Exception {
         try {
-            Connection con = DBConnection.getConnection();
             final String SQL = "SELECT * FROM users WHERE name=? AND password=?";
 
             PreparedStatement pstmt = con.prepareStatement(SQL);
             pstmt.setString(1, name);
-            pstmt.setString(2,password);
+            pstmt.setString(2, password);
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -31,10 +31,7 @@ class AuthService {
 
         try {
             final String SQL = "SELECT name FROM users WHERE name = ?";
-
-            Connection con = DBConnection.getConnection();
             PreparedStatement pstmt = con.prepareStatement(SQL);
-
             pstmt.setString(1, name);
             try (ResultSet rs = pstmt.executeQuery()) {
                 return rs.next(); // true if at least one row exists
@@ -45,24 +42,25 @@ class AuthService {
         }
     }
 
-    public static void createUser(String name, String password) {
+    public static boolean createUser(String name, String password) {
         try {
-            Connection con = DBConnection.getConnection();
             if (checkUsername(name)) {
-                System.out.println("Username already exists.");
-                return;
+                System.out.println("Username already exists. Try with a different username");
+                return false;
             }
-            final String SQL = "INSERT INTO users VALUES (?,?,?)";
+            final String SQL = "INSERT INTO users (name, password, role) VALUES (?,?,?)";
 
             PreparedStatement pstmt = con.prepareStatement(SQL);
             pstmt.setString(1, name);
             pstmt.setString(2, password);
             pstmt.setString(3, "owner");
-
             pstmt.executeUpdate();
+            System.out.println("User created successfully.");
+            return true;
         } catch (Exception e) {
             System.err.println("Error creating user: " + e);
         }
+        return false;
     }
 
 }

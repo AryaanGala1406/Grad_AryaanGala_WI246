@@ -1,0 +1,18 @@
+Stream Api Assignment Question
+
+Employee
+----------
+name
+age
+gender
+salary
+designation
+department
+ 
+* Find the highest salary paid employee
+* Find how many male & female employees working in company (numbers)
+* Total expense for the company department wise
+* Who is the top 5 senior employees in the company
+* Find only the names who all are managers
+* Hike the salary by 20% for everyone except manager
+* Find the total number of employees

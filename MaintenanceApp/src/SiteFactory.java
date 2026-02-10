@@ -2,17 +2,18 @@ public class SiteFactory {
 
     public static Site create(int id, int l, int w, String type, int ownerId) {
 
-        Site s;
-        switch (type) {
-            case "Villa" -> s = new Villa(l, w);
-            case "Apartment" -> s = new Apartment(l, w);
-            case "Independent House" -> s = new IndependentHouse(l, w);
-            case "Open Site" -> s = new OpenSite(l, w);
-            default -> throw new IllegalArgumentException();
-        }
+        SiteType siteType = SiteType.fromDb(type);  // normalize + validate
 
-        s.siteId = id;
-        s.ownerId = ownerId;
+        Site s = switch (siteType) {
+            case VILLA -> new Villa(l, w);
+            case APARTMENT -> new Apartment(l, w);
+            case INDEPENDENT_HOUSE -> new IndependentHouse(l, w);
+            case OPEN_SITE -> new OpenSite(l, w);
+        };
+
+        s.setSiteId(id);
+        s.setOwnerId(ownerId);
+
         return s;
     }
 }

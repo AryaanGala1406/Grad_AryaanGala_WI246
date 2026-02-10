@@ -1,15 +1,26 @@
-abstract class Site {
+enum SiteType {
+    VILLA, APARTMENT, INDEPENDENT_HOUSE, OPEN_SITE;
+
+    public static SiteType fromDb(String dbValue) {
+        if (dbValue == null)
+            throw new IllegalArgumentException("Site type is null");
+        String normalized = dbValue.trim()
+                .toUpperCase()
+                .replace(' ', '_');
+        return SiteType.valueOf(normalized);
+    }
+}
+
+public abstract class Site {
 
     protected int siteId;
     protected int length;
     protected int width;
-    protected boolean occupied;
-    protected String type; // Villa, Apartment, etc
+    protected SiteType type;
     protected int ownerId;
-
     protected String ownerName;
 
-    Site(int length, int width, String type, boolean occupied) {
+    protected Site(int length, int width, SiteType type) {
         this.length = length;
         this.width = width;
         this.type = type;
@@ -18,63 +29,49 @@ abstract class Site {
     public int getArea() {
         return length * width;
     }
-    
-    // Utility display
-    void displaySite() {
-        System.out.println("Site ID        : " + this.siteId);
-        System.out.println("Type           : " + this.type);
-        System.out.println("Size           : " + this.length + " x " + this.width);
-        System.out.println("Occupied       : " + this.occupied);
-        System.out.println("Owner Name     : " + this.ownerName);
-        System.out.println("Maintenance Rs : " + this.calculateMaintenance());
-        System.out.println("----------------------------------");
-    }
-    
+
     public abstract int calculateMaintenance();
-
-    // getters & setters
-
-    public void setOwnerName(String name) {
-        this.ownerName = name;
-    }
 
     public int getSiteId() {
         return siteId;
     }
 
-    public void setSiteId(int siteId) {
-        this.siteId = siteId;
+    public int getLength() {
+        return length;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public SiteType getType() {
+        return type;
     }
 
     public int getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(int ownerId) {
-        this.ownerId = ownerId;
-    }
-
-    public boolean isOccupied() {
-        return occupied;
-    }
-
-    public void setOccupied(boolean occupied) {
-        this.occupied = occupied;
-    }
-
     public String getOwnerName() {
         return ownerName;
     }
 
-    public String getType() {
-        return type;
+    public void setOwnerName(String name) {
+        this.ownerName = name;
     }
 
+    public void setSiteId(int siteId) {
+        this.siteId = siteId;
+    }
+
+    public void setOwnerId(int ownerId) {
+        this.ownerId = ownerId;
+    }
 }
 
 class Villa extends Site {
     Villa(int l, int w) {
-        super(l, w, "Villa", true);
+        super(l, w, SiteType.VILLA);
     }
 
     public int calculateMaintenance() {
@@ -84,7 +81,7 @@ class Villa extends Site {
 
 class Apartment extends Site {
     Apartment(int l, int w) {
-        super(l, w, "Apartment", true);
+        super(l, w, SiteType.APARTMENT);
     }
 
     public int calculateMaintenance() {
@@ -94,7 +91,7 @@ class Apartment extends Site {
 
 class IndependentHouse extends Site {
     IndependentHouse(int l, int w) {
-        super(l, w, "Independent House", true);
+        super(l, w, SiteType.INDEPENDENT_HOUSE);
     }
 
     public int calculateMaintenance() {
@@ -104,17 +101,10 @@ class IndependentHouse extends Site {
 
 class OpenSite extends Site {
     OpenSite(int l, int w) {
-        super(l, w, "Open Site", false);
+        super(l, w, SiteType.OPEN_SITE);
     }
 
     public int calculateMaintenance() {
-        return getArea() * 9;
+        return getArea() * 6;
     }
-}
-
-class UpdateRequest {
-    int reqId;
-    int siteId;
-    String newName;
-    String status;
 }
