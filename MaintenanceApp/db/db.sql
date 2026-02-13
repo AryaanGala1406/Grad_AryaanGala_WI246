@@ -1,19 +1,46 @@
+CREATE TABLE maintenance_transactions (
+    txn_id SERIAL PRIMARY KEY,
+    maintenance_id INT REFERENCES maintenance(maintenance_id),
+    owner_id INT REFERENCES users(user_id),
+    paid_amount INT NOT NULL CHECK (paid_amount > 0),
+    paid_on TIMESTAMP DEFAULT now()
+);
 
 CREATE TABLE maintenance (
     maintenance_id SERIAL PRIMARY KEY,
-    site_id INT REFERENCES sites(site_id),
-    user_id INT REFERENCES users(user_id),
-    year INT,
-    amount INT,
-    paid_on DATE
+    site_id INT NOT NULL REFERENCES sites(site_id),
+    owner_id INT NOT NULL REFERENCES users(user_id),
+    year INT NOT NULL,
+    total_amount INT NOT NULL CHECK (total_amount >= 0),
+    balance_amount INT NOT NULL CHECK (balance_amount >= 0),
+    status VARCHAR(10) DEFAULT 'PENDING',
+    created_on TIMESTAMP DEFAULT now(),
+    completed_on DATE,
+    CHECK (status IN ('PENDING','COMPLETED')),
+    UNIQUE (site_id, year)
 );
 
--- transaction database
--- add balance amount inside the maintenance 
--- pending, completed 
--- trigger -> when balace = 0 status to paid or completed
+CREATE OR REPLACE FUNCTION update_maintenance_after_payment()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE maintenance
+    SET balance_amount = balance_amount - NEW.paid_amount
+    WHERE maintenance_id = NEW.maintenance_id;
 
+    UPDATE maintenance
+    SET status = 'COMPLETED',
+        completed_on = CURRENT_DATE
+    WHERE maintenance_id = NEW.maintenance_id
+      AND balance_amount = 0;
 
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_maintenance
+AFTER INSERT ON maintenance_transactions
+FOR EACH ROW
+EXECUTE FUNCTION update_maintenance_after_payment();
 
 -- USERS
 CREATE TABLE IF NOT EXISTS users (
@@ -62,17 +89,6 @@ CREATE TRIGGER set_occupancy
 BEFORE INSERT OR UPDATE ON sites
 FOR EACH ROW
 EXECUTE FUNCTION enforce_occupancy_rule();
-
--- MAINTENANCE
-CREATE TABLE IF NOT EXISTS maintenance (
-    maintenance_id SERIAL PRIMARY KEY,
-    site_id   INT REFERENCES sites(site_id) NOT NULL,
-    year      INT NOT NULL CHECK (year >= 2000),
-    amount    INT NOT NULL CHECK (amount >= 0),
-    status        VARCHAR(10)  NOT NULL DEFAULT 'PENDING',
-    paid_on   DATE,
-    CHECK (status IN ('PENDING','COMPLETED'))
-);
 
 -- UPDATE REQUESTS (merged)
 CREATE TABLE IF NOT EXISTS update_requests (

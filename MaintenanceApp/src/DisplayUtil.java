@@ -3,21 +3,23 @@ import java.util.List;
 
 public final class DisplayUtil {
 
-    private static final DateTimeFormatter DT_FMT =
-            DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+    private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-    private DisplayUtil() {}
+    static AdminDAO dao = new AdminDBOperations();
+
+    private DisplayUtil() {
+    }
 
     // ------------------ SITES ------------------
     public static void displaySites(List<Site> sites) {
 
         System.out.println(
-            "+---------+-------------------+---------+---------+---------+-----------+-----------------+---------------+");
+                "+---------+-------------------+---------+---------+---------+-----------+-----------------+---------------+");
         System.out.printf("| %-7s | %-17s | %-7s | %-7s | %-7s | %-9s | %-15s | %-13s |\n",
                 "Site ID", "Type", "Length", "Width", "Area",
                 "Owner ID", "Owner Name", "Maintenance");
         System.out.println(
-            "+---------+-------------------+---------+---------+---------+-----------+-----------------+---------------+");
+                "+---------+-------------------+---------+---------+---------+-----------+-----------------+---------------+");
 
         for (Site s : sites) {
             System.out.printf("| %-7d | %-17s | %-7d | %-7d | %-7d | %-9d | %-15s | %-13d |\n",
@@ -28,23 +30,23 @@ public final class DisplayUtil {
                     s.getArea(),
                     s.getOwnerId(),
                     s.getOwnerName() == null ? "N/A" : s.getOwnerName(),
-                    s.calculateMaintenance());
+                    dao.getPendingMaintenanceBySiteId(s.getSiteId()));
         }
 
         System.out.println(
-            "+---------+-------------------+---------+---------+---------+-----------+-----------------+---------------+");
+                "+---------+-------------------+---------+---------+---------+-----------+-----------------+---------------+");
     }
 
     // ------------------ DETAILS REQUESTS ------------------
     public static void displayDetailsRequests(List<DetailsRequest> requests) {
 
         System.out.println(
-            "+---------+-------------+---------+-------------+----------------------+----------------------+");
+                "+---------+-------------+---------+-------------+----------------------+----------------------+");
         System.out.printf("| %-7s | %-11s | %-7s | %-11s | %-20s | %-20s |\n",
                 "Req ID", "Req Type", "User ID", "Status",
                 "New Name", "Requested On");
         System.out.println(
-            "+---------+-------------+---------+-------------+----------------------+----------------------+");
+                "+---------+-------------+---------+-------------+----------------------+----------------------+");
 
         for (DetailsRequest r : requests) {
             String time = r.getRequestedOn() == null
@@ -61,19 +63,19 @@ public final class DisplayUtil {
         }
 
         System.out.println(
-            "+---------+-------------+---------+-------------+----------------------+----------------------+");
+                "+---------+-------------+---------+-------------+----------------------+----------------------+");
     }
 
     // ------------------ SITE REQUESTS ------------------
     public static void displaySiteRequests(List<SiteRequest> requests) {
 
         System.out.println(
-            "+---------+-------------+---------+---------+-------------+-----------------+-----------------+----------------------+");
+                "+---------+-------------+---------+---------+-------------+-----------------+-----------------+----------------------+");
         System.out.printf("| %-7s | %-11s | %-7s | %-7s | %-11s | %-15s | %-15s | %-20s |\n",
                 "Req ID", "Req Type", "User ID", "Site ID", "Status",
                 "New Owner", "New Site Type", "Requested On");
         System.out.println(
-            "+---------+-------------+---------+---------+-------------+-----------------+-----------------+----------------------+");
+                "+---------+-------------+---------+---------+-------------+-----------------+-----------------+----------------------+");
 
         for (SiteRequest r : requests) {
             String time = r.getRequestedOn() == null
@@ -92,6 +94,34 @@ public final class DisplayUtil {
         }
 
         System.out.println(
-            "+---------+-------------+---------+---------+-------------+-----------------+-----------------+----------------------+");
+                "+---------+-------------+---------+---------+-------------+-----------------+-----------------+----------------------+");
     }
+
+    public static void displayTransactions(List<MaintenanceTransaction> list) {
+        System.out.println(
+                "+---------+---------+-----------------+------+------------+----------------------+----------------+");
+        System.out.printf("| %-7s | %-7s | %-15s | %-4s | %-10s | %-20s | %-14s |\n",
+                "Txn ID", "Site ID", "Owner Name", "Year",
+                "Paid Amt", "Paid On", "Remaining");
+        System.out.println(
+                "+---------+---------+-----------------+------+------------+----------------------+----------------+");
+
+        for (MaintenanceTransaction t : list) {
+                String time = t.getPaidOn() == null
+                    ? "N/A"
+                    : t.getPaidOn().format(DT_FMT);
+            System.out.printf("| %-7d | %-7d | %-15s | %-4d | %-10d | %-20s | %-14d |\n",
+                    t.getTxnId(),
+                    t.getSiteId(),
+                    t.getOwnerName(),
+                    t.getYear(),
+                    t.getPaidAmount(),
+                    time,
+                    t.getRemainingBalance());
+        }
+
+        System.out.println(
+                "+---------+---------+-----------------+------+------------+----------------------+----------------+");
+    }
+
 }

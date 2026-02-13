@@ -2,6 +2,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.List;
 
 class UserDBOperations implements UserDAO {
 
@@ -154,6 +155,142 @@ class UserDBOperations implements UserDAO {
             System.out.println(e);
         }
         return null;
+    }
+
+    public int getPendingMaintenance(int siteId, int ownerId) {
+
+        String SQL = """
+                    SELECT balance_amount
+                    FROM maintenance
+                    WHERE site_id = ?
+                      AND owner_id = ?
+                      AND status = 'PENDING'
+                """;
+
+        try (PreparedStatement ps = con.prepareStatement(SQL)) {
+            ps.setInt(1, siteId);
+            ps.setInt(2, ownerId);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("balance_amount");
+            }
+        } catch (Exception e) {
+            System.out.println("getPendingMaintenance error: " + e.getMessage());
+        }
+
+        return 0;
+    }
+
+    public int getMaintenanceId(int siteId, int ownerId) {
+
+        String SQL = """
+                    SELECT maintenance_id
+                    FROM maintenance
+                    WHERE site_id = ?
+                      AND owner_id = ?
+                      AND status = 'PENDING'
+                """;
+
+        try (PreparedStatement ps = con.prepareStatement(SQL)) {
+            ps.setInt(1, siteId);
+            ps.setInt(2, ownerId);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("maintenance_id");
+            }
+        } catch (Exception e) {
+            System.out.println("getMaintenanceId error: " + e.getMessage());
+        }
+
+        return -1;
+    }
+
+    public boolean payMaintenance(int siteId, int ownerId, int amount) {
+
+        int balance = getPendingMaintenance(siteId, ownerId);
+
+        if (balance == 0) {
+            System.out.println("No pending maintenance.");
+            return false;
+        }
+
+        if (amount <= 0 || amount > balance) {
+            System.out.println("Invalid payment amount.");
+            return false;
+        }
+
+        int maintenanceId = getMaintenanceId(siteId, ownerId);
+
+        if (maintenanceId == -1) {
+            System.out.println("Maintenance record not found.");
+            return false;
+        }
+
+        String SQL = """
+                    INSERT INTO maintenance_transactions
+                    (maintenance_id, owner_id, paid_amount)
+                    VALUES (?, ?, ?)
+                """;
+
+        try (PreparedStatement ps = con.prepareStatement(SQL)) {
+
+            ps.setInt(1, maintenanceId);
+            ps.setInt(2, ownerId);
+            ps.setInt(3, amount);
+
+            ps.executeUpdate();
+
+            System.out.println("Payment successful!");
+            return true;
+
+        } catch (Exception e) {
+            System.out.println("payMaintenance error: " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    public List<MaintenanceTransaction> getMyTransactions(int ownerId) {
+
+        List<MaintenanceTransaction> list = new ArrayList<>();
+
+        String SQL = """
+                    SELECT t.txn_id,
+                           m.site_id,
+                           m.year,
+                           t.paid_amount,
+                           t.paid_on,
+                           m.balance_amount
+                    FROM maintenance_transactions t
+                    JOIN maintenance m ON t.maintenance_id = m.maintenance_id
+                    WHERE t.owner_id = ?
+                    ORDER BY t.paid_on DESC
+                """;
+
+        try (PreparedStatement ps = con.prepareStatement(SQL)) {
+
+            ps.setInt(1, ownerId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(new MaintenanceTransaction(
+                        rs.getInt("txn_id"),
+                        rs.getInt("site_id"),
+                        "SELF",
+                        rs.getInt("year"),
+                        rs.getInt("paid_amount"),
+                        rs.getObject("paid_on", java.time.OffsetDateTime.class),
+                        rs.getInt("balance_amount")));
+            }
+
+        } catch (Exception e) {
+            System.out.println("getMyTransactions error: " + e.getMessage());
+        }
+
+        return list;
     }
 
 }

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public interface AdminDAO {
 
@@ -12,12 +13,11 @@ public interface AdminDAO {
 
 
     boolean assignSiteByUserId(int siteId, int userId);
+    boolean assignMaintenance(int siteId, int ownerId);
     boolean updateSiteType(int siteId, String type);
     boolean removeOwnerBySiteId(int siteId);
-    
-    boolean collectMaintenance(int siteId);
-    ArrayList<Site> pendingMaintenance(int year);
-
+    int getPendingMaintenanceBySiteId(int siteId);
+    List<MaintenanceTransaction> getAllTransactions();
     Request getRequestById(int reqId);
 }
 

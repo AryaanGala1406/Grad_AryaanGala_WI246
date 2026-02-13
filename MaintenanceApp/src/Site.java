@@ -29,9 +29,7 @@ public abstract class Site {
     public int getArea() {
         return length * width;
     }
-
-    public abstract int calculateMaintenance();
-
+    
     public int getSiteId() {
         return siteId;
     }
@@ -73,19 +71,11 @@ class Villa extends Site {
     Villa(int l, int w) {
         super(l, w, SiteType.VILLA);
     }
-
-    public int calculateMaintenance() {
-        return getArea() * 9;
-    }
 }
 
 class Apartment extends Site {
     Apartment(int l, int w) {
         super(l, w, SiteType.APARTMENT);
-    }
-
-    public int calculateMaintenance() {
-        return getArea() * 9;
     }
 }
 
@@ -93,18 +83,10 @@ class IndependentHouse extends Site {
     IndependentHouse(int l, int w) {
         super(l, w, SiteType.INDEPENDENT_HOUSE);
     }
-
-    public int calculateMaintenance() {
-        return getArea() * 9;
-    }
 }
 
 class OpenSite extends Site {
     OpenSite(int l, int w) {
         super(l, w, SiteType.OPEN_SITE);
-    }
-
-    public int calculateMaintenance() {
-        return getArea() * 6;
     }
 }

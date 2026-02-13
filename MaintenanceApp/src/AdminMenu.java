@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.List;
 
 public class AdminMenu {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -21,7 +22,7 @@ public class AdminMenu {
                         9. Update Site Type 
                         10. Remove Owner 
                         11. View Pending Maintenance
-                        12. Collect Maintenance
+                        12. View Transactions
                         13. Logout
                         ----------------------------
                         """);
@@ -85,8 +86,9 @@ public class AdminMenu {
                         }
                     }
 
-                    case 11 -> {}
-                    case 12 -> {}
+                    case 11 -> AdminHelper.viewPendingMaintenance();
+                    
+                    case 12 -> AdminHelper.printTransactions();
 
                     case 13 -> System.out.println("Logging out of the system.");
                     

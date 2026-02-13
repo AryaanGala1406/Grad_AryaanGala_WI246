@@ -32,7 +32,6 @@ public class AdminHelper {
     }
 
     static void viewPendingRequest(String reqTypeInput) {
-
         ReqType reqType;
         try {
             reqType = ReqType.fromDb(reqTypeInput);
@@ -83,7 +82,6 @@ public class AdminHelper {
                 return false;
             }
 
-            // 2️⃣ Display request (based on type)
             if (r instanceof DetailsRequest d) {
                 DisplayUtil.displayDetailsRequests(List.of(d));
             } else if (r instanceof SiteRequest s) {
@@ -93,10 +91,8 @@ public class AdminHelper {
             System.out.print("Do you want to approve the request (Yes/No) ");
             boolean approve = br.readLine().trim().equalsIgnoreCase("YES");
 
-            return dao.updateRequestStatus(
-                    reqId,
-                    approve,
-                    ReqType.fromDb(reqType).name());
+            if (dao.updateRequestStatus(reqId, approve, ReqType.fromDb(reqType).name()))
+                return true;
 
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -110,8 +106,11 @@ public class AdminHelper {
             int siteId = Integer.parseInt(br.readLine());
             System.out.print("Enter the user id: ");
             int userId = Integer.parseInt(br.readLine());
-            if (dao.assignSiteByUserId(siteId, userId))
-                return true;
+            if (dao.assignSiteByUserId(siteId, userId)) {
+                if (dao.assignMaintenance(siteId, userId)) {
+                    return true;
+                }
+            }
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -157,62 +156,24 @@ public class AdminHelper {
         }
         return false;
     }
-    // static void viewPendingMaintenance() {
 
-    // ArrayList<Site> list = dao.getPendingMaintenance();
+    static void viewPendingMaintenance() {
+        try {
+            System.out.print("Enter the site id: ");
+            int siteId = Integer.parseInt(br.readLine());
+            int amount = dao.getPendingMaintenanceBySiteId(siteId);
+            System.out.println("Maintenance Pending for " + siteId + " is " + amount);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
 
-    // if (list.isEmpty()) {
-    // System.out.println("No pending maintenance.");
-    // return;
-    // }
-
-    // for (Site s : list) {
-    // s.displaySite();
-    // }
-    // }
-
-    // private static void collectMaintenance() throws Exception {
-
-    // System.out.print("Enter Site ID: ");
-    // int siteId = Integer.parseInt(br.readLine());
-
-    // dao.collectMaintenance(siteId);
-    // }
-
-    // private static void viewUpdateRequests() {
-
-    // ArrayList<UpdateRequest> list = dao.getPendingRequests();
-
-    // if (list.isEmpty()) {
-    // System.out.println("No pending update requests.");
-    // return;
-    // }
-
-    // System.out.println("\n--- Pending Requests ---");
-    // for (UpdateRequest ur : list) {
-    // System.out.println("Request ID : " + ur.reqId);
-    // System.out.println("Site ID : " + ur.siteId);
-    // System.out.println("New Name : " + ur.newName);
-    // System.out.println("Status : " + ur.status);
-    // System.out.println("------------------------");
-    // }
-    // }
-
-    // private static void approveOrReject() throws Exception {
-
-    // System.out.print("Enter Request ID: ");
-    // int reqId = Integer.parseInt(br.readLine());
-
-    // System.out.print("Approve request? (yes/no): ");
-    // String choice = br.readLine();
-
-    // boolean approve = choice.equalsIgnoreCase("yes");
-
-    // if (dao.approveRequest(reqId, approve)) {
-    // System.out.println("Request processed successfully.");
-    // } else {
-    // System.out.println("Failed to process request.");
-    // }
-    // }
-
+    static void printTransactions() {
+        List<MaintenanceTransaction> txns = dao.getAllTransactions();
+        if (txns.isEmpty()) {
+            System.out.println("No transactions found.");
+        } else {
+            DisplayUtil.displayTransactions(txns);
+        }
+    }
 }

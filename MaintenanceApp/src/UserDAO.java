@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public interface UserDAO {
     // find the list of sites that the owner own using their owner id 
@@ -17,5 +18,11 @@ public interface UserDAO {
 
     // get the site details to print with the help of site id
     Site getSiteBySiteId(int siteId);
+
+    int getPendingMaintenance(int siteId, int ownerId);
+    int getMaintenanceId(int siteId, int ownerId);
+    boolean payMaintenance(int siteId, int ownerId, int amount);
+    List<MaintenanceTransaction> getMyTransactions(int ownerId);
+
 }
 

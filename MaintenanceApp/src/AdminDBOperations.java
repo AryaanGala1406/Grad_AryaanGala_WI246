@@ -2,7 +2,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 public class AdminDBOperations implements AdminDAO {
 
@@ -12,28 +14,28 @@ public class AdminDBOperations implements AdminDAO {
     // find the request with the help of request id
     public Request getRequestById(int reqId) {
 
-    final String SQL = """
-        SELECT *
-        FROM update_requests
-        WHERE req_id = ?
-    """;
+        final String SQL = """
+                    SELECT *
+                    FROM update_requests
+                    WHERE req_id = ?
+                """;
 
-    try (PreparedStatement ps = con.prepareStatement(SQL)) {
+        try (PreparedStatement ps = con.prepareStatement(SQL)) {
 
-        ps.setInt(1, reqId);
+            ps.setInt(1, reqId);
 
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return mapRowToRequest(rs); // your existing mapper
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToRequest(rs); // your existing mapper
+                }
             }
+
+        } catch (SQLException e) {
+            System.out.println("Error fetching request: " + e.getMessage());
         }
 
-    } catch (SQLException e) {
-        System.out.println("Error fetching request: " + e.getMessage());
+        return null;
     }
-
-    return null;
-}
 
     // View All Sites -> view all sites that are available
     public ArrayList<Site> getAllSites() {
@@ -174,7 +176,6 @@ public class AdminDBOperations implements AdminDAO {
 
     // is request type pending or not
     public boolean isRequestPending(int reqId) {
-
         final String SQL = """
                     SELECT status
                     FROM update_requests
@@ -209,48 +210,111 @@ public class AdminDBOperations implements AdminDAO {
             return false;
         }
 
-        final String SQL = """
-                    UPDATE update_requests
-                    SET status = ?
-                    WHERE req_id = ?
-                      AND status = 'PENDING'
-                      AND req_type = ?
-                """;
-
-        try (PreparedStatement ps = con.prepareStatement(SQL)) {
-
-            ps.setString(1, approve ? "APPROVED" : "REJECTED");
-            ps.setInt(2, reqId);
-            ps.setString(3, reqType);
-
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            System.out.println("Error updating request: " + e.getMessage());
+        Request req = getRequestById(reqId);
+        if (req == null) {
+            System.out.println("Request not found.");
+            return false;
         }
 
-        return false;
+        try {
+            con.setAutoCommit(false);
+
+            final String SQL = """
+                        UPDATE update_requests
+                        SET status = ?
+                        WHERE req_id = ?
+                          AND status = 'PENDING'
+                          AND req_type = ?
+                    """;
+
+            try (PreparedStatement ps = con.prepareStatement(SQL)) {
+
+                ps.setString(1, approve ? "APPROVED" : "REJECTED");
+                ps.setInt(2, reqId);
+                ps.setString(3, reqType);
+
+                int updated = ps.executeUpdate();
+
+                if (updated == 0) {
+                    con.rollback();
+                    return false;
+                }
+            }
+
+            if (approve && req instanceof SiteRequest siteReq) {
+
+                Integer siteId = siteReq.getSiteId();
+                int ownerId = siteReq.getUserId();
+
+                if (siteReq.getNewOwnerName() != null && siteId != null) {
+
+                    boolean assigned = assignSiteByUserId(siteId, ownerId);
+
+                    if (!assigned) {
+                        con.rollback();
+                        return false;
+                    }
+
+                    boolean maintenanceCreated = assignMaintenance(siteId, ownerId);
+
+                    if (!maintenanceCreated) {
+                        con.rollback();
+                        return false;
+                    }
+                }
+
+                // If it was site type change request
+                if (siteReq.getNewSiteType() != null && siteId != null) {
+                    updateSiteType(siteId, siteReq.getNewSiteType());
+                }
+            }
+
+            con.commit();
+            return true;
+
+        } catch (Exception e) {
+            try {
+                con.rollback();
+            } catch (Exception ignored) {
+            }
+            System.out.println("Error updating request: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                con.setAutoCommit(true);
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     // 8. Assign Site to Owner
     public boolean assignSiteByUserId(int siteId, int userId) {
+
         final String SQL = """
                     UPDATE sites s
                     SET user_id = ?
                     WHERE s.site_id = ?
-                    AND EXISTS (SELECT 1 FROM users u WHERE u.user_id = ?)
+                      AND s.user_id IS NULL
+                      AND EXISTS (
+                          SELECT 1
+                          FROM users u
+                          WHERE u.user_id = ?
+                      )
                 """;
 
         try (PreparedStatement ps = con.prepareStatement(SQL)) {
+
             ps.setInt(1, userId);
             ps.setInt(2, siteId);
             ps.setInt(3, userId);
-            int updated = ps.executeUpdate(); // use executeUpdate for UPDATE statements
+
+            int updated = ps.executeUpdate();
             return updated > 0;
+
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("assignSiteByUserId error: " + e.getMessage());
+            return false;
         }
-        return false;
     }
 
     // 9. Update Site Type
@@ -312,116 +376,116 @@ public class AdminDBOperations implements AdminDAO {
         return null; // No site found
     }
 
-    // 3. Collect Maintenance
-    public boolean collectMaintenance(int siteId) {
-        Site s = getSiteById(siteId);
+    public boolean assignMaintenance(int siteId, int ownerId) {
 
-        if (s == null) {
-            System.out.println("Site not found");
+        Site site = getSiteById(siteId);
+
+        if (site == null) {
+            System.out.println("Site not found. Cannot assign maintenance.");
             return false;
         }
 
-        int amount = s.calculateMaintenance();
-        System.out.println("Maintenance Amount = Rs " + amount);
+        int area = site.getLength() * site.getWidth();
 
-        String SQL = "UPDATE sites SET status=COMPLETED WHERE site_id=?";
-        try (PreparedStatement ps = con.prepareStatement(SQL)) {
-            ps.setInt(1, siteId);
-            ps.executeUpdate();
-            System.out.println("Maintenance collected successfully");
-            return true;
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        return false;
-    }
+        int rate = (site.getType() == SiteType.OPEN_SITE) ? 6 : 9;
+        int amount = area * rate;
 
-    // 4. Pending Maintenance
-    public ArrayList<Site> pendingMaintenance(int year) {
-        ArrayList<Site> list = new ArrayList<>();
         String SQL = """
-                SELECT * FROM sites s
-                WHERE NOT EXISTS (
-                    SELECT 1 FROM maintenance m
-                    WHERE m.site_id=s.site_id AND m.year=?
+                INSERT INTO maintenance (
+                    site_id,
+                    owner_id,
+                    year,
+                    total_amount,
+                    balance_amount
                 )
+                VALUES (?, ?, EXTRACT(YEAR FROM CURRENT_DATE), ?, ?)
+                ON CONFLICT (site_id, year) DO NOTHING
                 """;
 
         try (PreparedStatement ps = con.prepareStatement(SQL)) {
-            ps.setInt(1, year);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(SiteFactory.create(
-                        rs.getInt("site_id"),
-                        rs.getInt("length"),
-                        rs.getInt("width"),
-                        rs.getString("type"),
-                        rs.getInt("owner_id")));
-            }
+
+            ps.setInt(1, siteId);
+            ps.setInt(2, ownerId);
+            ps.setInt(3, amount);
+            ps.setInt(4, amount);
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
+
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("assignMaintenance error: " + e.getMessage());
+            return false;
         }
-        return list;
     }
 
-    // public void collectMaintenance(int siteId, int year) {
-    // Site s = getSite(siteId);
-    // int amount = s.calculateMaintenance();
+    // Get Pending Maintenance
+    // Get Pending Maintenance (Remaining Balance)
+    public int getPendingMaintenanceBySiteId(int siteId) {
 
-    // try (PreparedStatement ps = con.prepareStatement(
-    // "INSERT INTO maintenance(site_id,year,amount,paid_on)
-    // VALUES(?,?,?,CURRENT_DATE)")) {
-    // ps.setInt(1, siteId);
-    // ps.setInt(2, year);
-    // ps.setInt(3, amount);
-    // ps.executeUpdate();
-    // System.out.println("Maintenance collected: Rs " + amount);
-    // } catch (Exception e) { System.out.println(e); }
-    // }
+        final String SQL = """
+                SELECT balance_amount
+                FROM maintenance
+                WHERE site_id = ?
+                  AND status = 'PENDING'
+                """;
 
-    // private Site getSite(int siteId) {
-    // try (PreparedStatement ps =
-    // con.prepareStatement("SELECT * FROM sites WHERE site_id=?")) {
-    // ps.setInt(1, siteId);
-    // ResultSet rs = ps.executeQuery();
-    // if (rs.next())
-    // return SiteFactory.create(
-    // siteId,
-    // rs.getInt("length"),
-    // rs.getInt("width"),
-    // rs.getString("type"),
-    // rs.getBoolean("occupied"),
-    // rs.getInt("owner_id")
-    // );
-    // } catch (Exception e) {}
-    // return null;
-    // }
+        try (PreparedStatement ps = con.prepareStatement(SQL)) {
 
-    // public ArrayList<Site> pendingMaintenance(int year) {
-    // ArrayList<Site> list = new ArrayList<>();
-    // String SQL = """
-    // SELECT * FROM sites s
-    // WHERE NOT EXISTS (
-    // SELECT 1 FROM maintenance m
-    // WHERE m.site_id=s.site_id AND m.year=?
-    // )
-    // """;
+            ps.setInt(1, siteId);
 
-    // try (PreparedStatement ps = con.prepareStatement(SQL)) {
-    // ps.setInt(1, year);
-    // ResultSet rs = ps.executeQuery();
-    // while (rs.next()) {
-    // list.add(SiteFactory.create(
-    // rs.getInt("site_id"),
-    // rs.getInt("length"),
-    // rs.getInt("width"),
-    // rs.getString("type"),
-    // rs.getBoolean("occupied"),
-    // rs.getInt("owner_id")
-    // ));
-    // }
-    // } catch (Exception e) { System.out.println(e); }
-    // return list;
-    // }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("balance_amount");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("getPendingMaintenanceBySiteId error: " + e.getMessage());
+        }
+
+        return 0; // No pending maintenance
+    }
+
+
+    public List<MaintenanceTransaction> getAllTransactions() {
+
+    List<MaintenanceTransaction> list = new ArrayList<>();
+
+    final String SQL = """
+        SELECT 
+            t.txn_id,
+            m.site_id,
+            u.name AS owner_name,
+            m.year,
+            t.paid_amount,
+            t.paid_on,
+            m.balance_amount
+        FROM maintenance_transactions t
+        JOIN maintenance m ON t.maintenance_id = m.maintenance_id
+        JOIN users u ON t.owner_id = u.user_id
+        ORDER BY t.paid_on DESC
+    """;
+
+    try (PreparedStatement ps = con.prepareStatement(SQL);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            list.add(new MaintenanceTransaction(
+                    rs.getInt("txn_id"),
+                    rs.getInt("site_id"),
+                    rs.getString("owner_name"),
+                    rs.getInt("year"),
+                    rs.getInt("paid_amount"),
+                    rs.getObject("paid_on", OffsetDateTime.class),
+                    rs.getInt("balance_amount")
+            ));
+        }
+
+    } catch (SQLException e) {
+        System.out.println("getAllTransactions error: " + e.getMessage());
+    }
+
+    return list;
+}
 
 }
