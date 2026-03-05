@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Bank</title>
+
+    <style>
+        /* ========== GLOBAL ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #f1f4f9;
+        }
+
+        /* ========== HEADER ========== */
+        header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-size: 32px;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            opacity: 0.9;
+        }
+
+        /* ========== LAYOUT ========== */
+        .container {
+            display: flex;
+            min-height: 80vh;
+        }
+
+        /* ========== SIDEBAR ========== */
+        nav {
+            width: 240px;
+            background: #1f2937;
+            color: white;
+            padding: 20px;
+        }
+
+        nav h3 {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+
+        nav h3:hover {
+            background: #374151;
+        }
+
+        .submenu {
+            margin-left: 15px;
+            display: none;
+        }
+
+        .submenu p {
+            padding: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #cbd5e1;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .submenu p:hover {
+            background: #475569;
+            color: white;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        main {
+            flex: 1;
+            padding: 40px;
+        }
+
+        /* Card */
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========== FORMS ========== */
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #16305a;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+
+        .result {
+            color: green;
+            font-weight: bold;
+        }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background: #111827;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+
+        /* ===== AUTH FORM STYLING ===== */
+        .auth-card {
+            max-width: 400px;
+            margin: auto;
+        }
+
+        .auth-card h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .primary-btn {
+            width: 100%;
+            padding: 10px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .primary-btn:hover {
+            background: #16305a;
+        }
+
+        /* Link style button */
+        .link-btn {
+            background: none;
+            border: none;
+            color: #1e3c72;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+            padding: 0;
+            margin-top: 5px;
+        }
+
+        .link-btn:hover {
+            color: #16305a;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>OUR BANK</h1>
+        <p>Banking at your doorsteps</p>
+    </header>
+
+    <div class="container">
+
+        <!-- SIDEBAR -->
+        <nav>
+            <h3 onclick="loadHome()">Home</h3>
+            <h3 onclick="loadAbout()">About Us</h3>
+
+            <h3 onclick="toggleMenu('servicesMenu')">Services ▼</h3>
+            <div class="submenu" id="servicesMenu">
+                <p onclick="loadLoan()">Loan</p>
+                <p onclick="loadDeposit()">Deposit</p>
+                <p onclick="loadAccount()">Account Opening</p>
+            </div>
+
+            <h3 onclick="toggleMenu('netMenu')">NetBanking ▼</h3>
+            <div class="submenu" id="netMenu">
+                <p onclick="showLogin()">Login</p>
+                <p onclick="showSignup()">Sign Up</p>
+            </div>
+
+            <h3 onclick="loadContact()">Contact Us</h3>
+        </nav>
+
+        <!-- MAIN -->
+        <main id="content">
+            <div class="card">
+                <h2>Welcome to Our Bank</h2>
+                <p>Experience next generation banking with our secure digital services.</p>
+            </div>
+        </main>
+
+    </div>
+
+    <footer>
+        www.ourbank.com | © 2026 All Rights Reserved
+    </footer>
+
+    <script>
+        /* ================= MENU TOGGLE ================= */
+        function toggleMenu(id) {
+            let menu = document.getElementById(id);
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        }
+
+        /* ================= HOME ================= */
+        function loadHome() {
+            document.getElementById("content").innerHTML = `
+    <div class="card">
+        <h2>Welcome to Our Bank</h2>
+        <p>Secure and reliable banking services at your fingertips.</p>
+    </div>`;
+        }
+
+        /* ================= ABOUT ================= */
+        function loadAbout() {
+            document.getElementById("content").innerHTML = `
+    <div class="card">
+        <h2>About Us</h2>
+        <p>Our Bank has been serving customers since 1995 with secure digital banking solutions.</p>
+    </div>`;
+        }
+
+        /* ================= CONTACT ================= */
+        function loadContact() {
+            document.getElementById("content").innerHTML = `
+    <div class="card">
+        <h2>Contact Us</h2>
+        Name:<input type="text" id="cname">
+        Email:<input type="email" id="cemail">
+        Message:<textarea id="cmsg" rows="4"></textarea>
+        <button onclick="validateContact()">Submit</button>
+        <div id="contactMsg"></div>
+    </div>`;
+        }
+
+        function validateContact() {
+            let name = document.getElementById("cname").value.trim();
+            let email = document.getElementById("cemail").value.trim();
+            let msg = document.getElementById("cmsg").value.trim();
+            let output = document.getElementById("contactMsg");
+
+            if (name.length < 3) {
+                output.innerHTML = "<p class='error'>Enter valid name</p>";
+                return;
+            }
+
+            if (!email.includes("@")) {
+                output.innerHTML = "<p class='error'>Enter valid email</p>";
+                return;
+            }
+
+            if (msg.length < 5) {
+                output.innerHTML = "<p class='error'>Message too short</p>";
+                return;
+            }
+
+            output.innerHTML = "<p class='result'>Message submitted successfully!</p>";
+        }
+
+        /* ================= LOAN ================= */
+        function loadLoan() {
+            document.getElementById("content").innerHTML = `
+    <div class="card">
+        <h2>Loan Calculator</h2>
+        Applicant:<input type="text" id="applicant">
+        Loan Type:
+        <select id="loanType" onchange="setInterest()">
+            <option value="">Select</option>
+            <option value="HOME">Home</option>
+            <option value="CAR">Car</option>
+            <option value="PERSONAL">Personal</option>
+        </select>
+        Interest:<input type="text" id="interest" readonly>
+        Amount:<input type="number" id="amount">
+        Duration (Years):<input type="number" id="duration">
+        <button onclick="calculateEMI()">Calculate EMI</button>
+        <div id="loanMessage"></div>
+    </div>`;
+        }
+
+        function setInterest() {
+            let type = document.getElementById("loanType").value;
+            let interest = document.getElementById("interest");
+
+            if (type === "HOME") interest.value = 9;
+            else if (type === "CAR") interest.value = 12;
+            else if (type === "PERSONAL") interest.value = 15;
+            else interest.value = "";
+        }
+
+        function calculateEMI() {
+            let name = document.getElementById("applicant").value.trim();
+            let type = document.getElementById("loanType").value;
+            let amt = parseFloat(document.getElementById("amount").value);
+            let years = parseInt(document.getElementById("duration").value);
+            let rate = parseFloat(document.getElementById("interest").value);
+            let message = document.getElementById("loanMessage");
+
+            if (name.length < 5) {
+                message.innerHTML = "<p class='error'>Name must be at least 5 characters</p>";
+                return;
+            }
+
+            if (type === "") {
+                message.innerHTML = "<p class='error'>Select loan type</p>";
+                return;
+            }
+
+            if (isNaN(amt) || amt <= 0) {
+                message.innerHTML = "<p class='error'>Enter valid amount</p>";
+                return;
+            }
+
+            if (isNaN(years) || years <= 0) {
+                message.innerHTML = "<p class='error'>Enter valid duration</p>";
+                return;
+            }
+
+            let monthlyRate = rate / 12 / 100;
+            let months = years * 12;
+
+            let emi = (amt * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+                (Math.pow(1 + monthlyRate, months) - 1);
+
+            message.innerHTML = "<p class='result'>EMI is ₹ " + emi.toFixed(2) + "</p>";
+        }
+
+        /* ================= DEPOSIT ================= */
+        function loadDeposit() {
+            document.getElementById("content").innerHTML = `
+    <div class="card">
+        <h2>Fixed Deposit</h2>
+        Amount:<input type="number" id="fdAmt">
+        Years:<input type="number" id="fdYears">
+        <button onclick="validateFD()">Calculate</button>
+        <div id="fdMsg"></div>
+    </div>`;
+        }
+
+        function validateFD() {
+            let amt = parseFloat(document.getElementById("fdAmt").value);
+            let years = parseInt(document.getElementById("fdYears").value);
+            let output = document.getElementById("fdMsg");
+
+            if (isNaN(amt) || amt < 1000) {
+                output.innerHTML = "<p class='error'>Minimum FD amount ₹1000</p>";
+                return;
+            }
+
+            if (isNaN(years) || years < 1) {
+                output.innerHTML = "<p class='error'>Minimum duration 1 year</p>";
+                return;
+            }
+
+            let maturity = amt * Math.pow(1.07, years);
+            output.innerHTML = "<p class='result'>Maturity Amount ₹ " + maturity.toFixed(2) + "</p>";
+        }
+
+        /* ================= ACCOUNT OPENING ================= */
+        function loadAccount() {
+            document.getElementById("content").innerHTML = `
+    <div class="card">
+        <h2>Open Account</h2>
+        Account Type:
+        <select id="accType">
+            <option value="">Select</option>
+            <option>Savings</option>
+            <option>Current</option>
+        </select>
+        Name:<input type="text" id="accName">
+        Initial Deposit:<input type="number" id="accAmt">
+        <button onclick="validateAccount()">Submit</button>
+        <div id="accMsg"></div>
+    </div>`;
+        }
+
+        function validateAccount() {
+            let type = document.getElementById("accType").value;
+            let name = document.getElementById("accName").value.trim();
+            let amt = parseFloat(document.getElementById("accAmt").value);
+            let output = document.getElementById("accMsg");
+
+            if (type === "") {
+                output.innerHTML = "<p class='error'>Select account type</p>";
+                return;
+            }
+
+            if (name.length < 5) {
+                output.innerHTML = "<p class='error'>Name must be 5+ characters</p>";
+                return;
+            }
+
+            if (isNaN(amt) || amt < 500) {
+                output.innerHTML = "<p class='error'>Minimum deposit ₹500</p>";
+                return;
+            }
+
+            output.innerHTML = "<p class='result'>Account created successfully!</p>";
+        }
+
+        /* ================= LOGIN ================= */
+        function showLogin() {
+            document.getElementById("content").innerHTML = `
+    <div class="card auth-card">
+        <h2>Login</h2>
+
+        <label>Username</label>
+        <input type="text" id="loginUser">
+
+        <label>Password</label>
+        <input type="password" id="loginPass">
+
+        <button class="primary-btn" onclick="validateLogin()">Login</button>
+
+        <div class="auth-footer">
+            <p>Don't have an account?</p>
+            <button class="link-btn" onclick="showSignup()">Register here</button>
+        </div>
+
+        <div id="loginMsg"></div>
+    </div>`;
+        }
+
+        function validateLogin() {
+            let user = document.getElementById("loginUser").value.trim();
+            let pass = document.getElementById("loginPass").value.trim();
+            let output = document.getElementById("loginMsg");
+
+            if (user.length < 4) {
+                output.innerHTML = "<p class='error'>Invalid username</p>";
+                return;
+            }
+
+            if (pass.length < 6) {
+                output.innerHTML = "<p class='error'>Password must be 6+ characters</p>";
+                return;
+            }
+
+            output.innerHTML = "<p class='result'>Login Successful!</p>";
+        }
+
+        /* ================= SIGNUP ================= */
+        function showSignup() {
+            document.getElementById("content").innerHTML = `
+    <div class="card auth-card">
+        <h2>Create Account</h2>
+
+        <label>Name</label>
+        <input type="text" id="regName">
+
+        <label>Email</label>
+        <input type="email" id="regEmail">
+
+        <label>Password</label>
+        <input type="password" id="regPass">
+
+        <label>Confirm Password</label>
+        <input type="password" id="regCpass">
+
+        <button class="primary-btn" onclick="validateSignup()">Register</button>
+
+        <div class="auth-footer">
+            <p>Already have an account?</p>
+            <button class="link-btn" onclick="showLogin()">Back to Login</button>
+        </div>
+
+        <div id="regMsg"></div>
+    </div>`;
+        }
+
+        function validateSignup() {
+            let name = document.getElementById("regName").value.trim();
+            let email = document.getElementById("regEmail").value.trim();
+            let pass = document.getElementById("regPass").value;
+            let cpass = document.getElementById("regCpass").value;
+            let output = document.getElementById("regMsg");
+
+            if (name.length < 5) {
+                output.innerHTML = "<p class='error'>Name must be 5+ characters</p>";
+                return;
+            }
+
+            if (!email.includes("@")) {
+                output.innerHTML = "<p class='error'>Enter valid email</p>";
+                return;
+            }
+
+            if (pass.length < 6) {
+                output.innerHTML = "<p class='error'>Password must be 6+ characters</p>";
+                return;
+            }
+
+            if (pass !== cpass) {
+                output.innerHTML = "<p class='error'>Passwords do not match</p>";
+                return;
+            }
+
+            output.innerHTML = "<p class='result'>Registration Successful!</p>";
+        }
+
+    </script>
+</body>
+
+</html>
