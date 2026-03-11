@@ -1,0 +1,24 @@
+<app-admin-menu></app-admin-menu>
+
+<h2>Update Student</h2>
+
+Select Reg No:
+<select [(ngModel)]="selectedRegNo" name="regNo" (change)="loadStudent()">
+  <option *ngFor="let s of students" [value]="s.regNo">
+    {{s.regNo}}
+  </option>
+</select>
+
+<br><br>
+<form (submit)="update($event)" *ngIf="student">
+  Roll No: <input type="number" [(ngModel)]="student.rollNo" name="rollNo">
+  <br><br>
+  Name: <input type="text" [(ngModel)]="student.name" name="name">
+  <br><br>
+  Standard: <input type="text" [(ngModel)]="student.standard" name="standard">
+  <br><br>
+  School: <input type="text" [(ngModel)]="student.school" name="school">
+  <br><br>
+  <button type="submit">Update Student</button>
+</form>
+<p>{{message}}</p>

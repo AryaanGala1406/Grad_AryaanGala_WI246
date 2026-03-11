@@ -1,0 +1,4 @@
+* Create an Angular Web App for Student management
+* Only Admins can login to create, update, remove the student records
+* Staff can only see the details of students
+* Student details are : regNo, rollNo, name, standard, school

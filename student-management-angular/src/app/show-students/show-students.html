@@ -1,0 +1,21 @@
+<app-admin-menu *ngIf="user.getRole() == 'Admin'"></app-admin-menu>
+<app-staff-menu *ngIf="user.getRole()  == 'Staff'"></app-staff-menu>
+<h2>SHOW STUDENTS</h2>
+
+<table border="1" *ngIf="students.length > 0">
+  <tr>
+    <th>Reg No</th>
+    <th>Roll No</th>
+    <th>Name</th>
+    <th>Standard</th>
+    <th>School</th>
+  </tr>
+
+  <tr *ngFor="let student of students">
+    <td>{{student.regNo}}</td>
+    <td>{{student.rollNo}}</td>
+    <td>{{student.name}}</td>
+    <td>{{student.standard}}</td>
+    <td>{{student.school}}</td>
+  </tr>
+</table>

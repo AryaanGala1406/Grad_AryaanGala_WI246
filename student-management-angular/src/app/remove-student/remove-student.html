@@ -1,0 +1,26 @@
+<app-admin-menu></app-admin-menu>
+
+<h2>Remove Student</h2>
+
+Select Reg No:
+
+<select [(ngModel)]="selectedRegNo" name="regNo" (change)="loadStudent()">
+  <option *ngFor="let s of students" [value]="s.regNo">
+    {{s.regNo}}
+  </option>
+</select>
+
+<br><br>
+
+<span *ngIf="student">
+
+<p><b>Roll No:</b> {{student.rollNo}}</p>
+<p><b>Name:</b> {{student.name}}</p>
+<p><b>Standard:</b> {{student.standard}}</p>
+<p><b>School:</b> {{student.school}}</p>
+
+<button (click)="remove()">Remove Student</button>
+
+</span>
+
+<p>{{message}}</p>

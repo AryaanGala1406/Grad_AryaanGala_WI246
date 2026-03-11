@@ -1,0 +1,6 @@
+<app-admin-menu *ngIf="user.getRole() == 'Admin'"></app-admin-menu>
+<app-staff-menu *ngIf="user.getRole()  == 'Staff'"></app-staff-menu>
+
+<div>
+  <h2>Welcome {{ user.getName() }}</h2>
+</div>
