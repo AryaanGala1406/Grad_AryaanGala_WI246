@@ -1,0 +1,10 @@
+<div class="toast-wrapper">
+  <div
+    *ngFor="let t of toasts"
+    class="toast"
+    [ngClass]="['toast--' + t.type]"
+    (click)="remove(t.id)"
+  >
+    {{ t.message }}
+  </div>
+</div>

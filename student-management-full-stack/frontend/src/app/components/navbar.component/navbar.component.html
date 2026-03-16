@@ -1,0 +1,15 @@
+<header class="navbar">
+  <div class="navbar-left">
+    <span class="page-title">Student Management</span>
+  </div>
+  <div class="navbar-right">
+    <input
+      class="search-input"
+      type="text"
+      placeholder="Search students..."
+      [(ngModel)]="search"
+      (keyup.enter)="onSearch()"
+    />
+    <button class="btn-primary" routerLink="/students/new">+ Add Student</button>
+  </div>
+</header>

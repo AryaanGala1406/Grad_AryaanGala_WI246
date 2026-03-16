@@ -1,0 +1,137 @@
+.form-page {
+  max-width: 720px;
+}
+
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a1a2e;
+  }
+}
+
+.back-btn {
+  padding: 8px 14px;
+  border: 1px solid #e0e3eb;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  color: #6b7280;
+  cursor: pointer;
+
+  &:hover {
+    background: #f4f6fb;
+  }
+}
+
+.loading-msg {
+  text-align: center;
+  padding: 60px;
+  color: #9ca3af;
+}
+
+.form-card {
+  background: #fff;
+  border: 1px solid #e8eaf0;
+  border-radius: 14px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  input,
+  select {
+    height: 42px;
+    padding: 0 14px;
+    border: 1.5px solid #e0e3eb;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1a1a2e;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+      border-color: #6366f1;
+    }
+  }
+}
+
+.err {
+  font-size: 12px;
+  color: #ef4444;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f2f8;
+}
+
+.btn-cancel {
+  height: 42px;
+  padding: 0 20px;
+  border: 1px solid #e0e3eb;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+
+  &:hover {
+    background: #f4f6fb;
+  }
+}
+
+.btn-save {
+  height: 42px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 8px;
+  background: #6366f1;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #4f46e5;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

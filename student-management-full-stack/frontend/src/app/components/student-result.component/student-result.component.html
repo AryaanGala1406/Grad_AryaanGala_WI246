@@ -1,0 +1,74 @@
+<div class="results-page">
+  <h2 class="page-title">Results</h2>
+
+  <!-- Summary -->
+  <div class="summary-row">
+    <div class="summary-card green">
+      <div class="s-num">{{ passCount }}</div>
+      <div class="s-label">Passed</div>
+    </div>
+    <div class="summary-card red">
+      <div class="s-num">{{ failCount }}</div>
+      <div class="s-label">Failed</div>
+    </div>
+    <div class="summary-card blue">
+      <div class="s-num">{{ all.length > 0 ? ((passCount / all.length) * 100).toFixed(0) : 0 }}%</div>
+      <div class="s-label">Pass Rate</div>
+    </div>
+    <div class="summary-card purple">
+      <div class="s-num">{{ avgPct }}%</div>
+      <div class="s-label">Average</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button [class.active]="tab === 'all'"  (click)="setTab('all')">All</button>
+    <button [class.active]="tab === 'pass'" (click)="setTab('pass')">Pass</button>
+    <button [class.active]="tab === 'fail'" (click)="setTab('fail')">Fail</button>
+  </div>
+
+  <div class="loading-msg" *ngIf="loading">Loading...</div>
+
+  <!-- Table -->
+  <div class="table-card" *ngIf="!loading">
+    <table class="table" *ngIf="filtered.length; else empty">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>School</th>
+          <th>Standard</th>
+          <th>Percentage</th>
+          <th>Grade</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of filtered; let i = index" (click)="go(s.regNo)" class="table-row">
+          <td class="rank">{{ i + 1 }}</td>
+          <td class="name-col">{{ s.name }}</td>
+          <td>{{ s.school }}</td>
+          <td>Std {{ s.standard }}</td>
+          <td>
+            <div class="pct-row">
+              <div class="pct-bar">
+                <div class="pct-fill" [style.width.%]="s.percentage"></div>
+              </div>
+              <span>{{ s.percentage }}%</span>
+            </div>
+          </td>
+          <td><span class="grade">{{ grade(s.percentage) }}</span></td>
+          <td>
+            <span class="status" [class]="s.percentage >= 40 ? 'pass' : 'fail'">
+              {{ s.percentage >= 40 ? 'PASS' : 'FAIL' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #empty>
+      <div class="empty">No results to show.</div>
+    </ng-template>
+  </div>
+</div>

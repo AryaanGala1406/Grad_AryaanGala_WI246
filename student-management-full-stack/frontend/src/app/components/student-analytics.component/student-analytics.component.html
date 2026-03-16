@@ -1,0 +1,101 @@
+<div class="analytics-page">
+  <h2 class="page-title">Analytics</h2>
+
+  <div class="loading-msg" *ngIf="loading">Loading...</div>
+
+  <div class="analytics-grid" *ngIf="!loading">
+
+    <!-- Gender -->
+    <div class="card">
+      <div class="card-title">Gender Distribution</div>
+      <div class="gender-list">
+        <div class="gender-row" *ngFor="let g of genderStats">
+          <div class="g-dot" [style.background]="g.color"></div>
+          <div class="g-label">{{ g.label }}</div>
+          <div class="g-bar-wrap">
+            <div class="g-bar" [style.width.%]="g.pct" [style.background]="g.color"></div>
+          </div>
+          <div class="g-count">{{ g.count }}</div>
+          <div class="g-pct">{{ g.pct }}%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- School -->
+    <div class="card">
+      <div class="card-title">Top Schools</div>
+      <div class="school-list">
+        <div class="school-row" *ngFor="let s of schoolStats; let i = index">
+          <div class="s-rank">{{ i + 1 }}</div>
+          <div class="s-info">
+            <div class="s-name">{{ s.name }}</div>
+            <div class="s-bar-wrap">
+              <div class="s-bar" [style.width.%]="(s.count / schoolStats[0].count) * 100"></div>
+            </div>
+          </div>
+          <div class="s-count">{{ s.count }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Standard -->
+    <div class="card card--wide">
+      <div class="card-title">Students per Standard</div>
+      <div class="std-list">
+        <div class="std-row" *ngFor="let s of standardStats">
+          <div class="std-label">Std {{ s.standard }}</div>
+          <div class="std-bar-wrap">
+            <div class="std-bar" [style.width.%]="(s.count / maxStd) * 100"></div>
+          </div>
+          <div class="std-count">{{ s.count }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Query: School Count -->
+    <div class="card">
+      <div class="card-title">School Count Query</div>
+      <div class="query-row">
+        <input class="q-input" type="text" [(ngModel)]="schoolQuery" placeholder="School name..." />
+        <button class="q-btn" (click)="querySchool()">Search</button>
+      </div>
+      <div class="q-result" *ngIf="schoolResult !== null">
+        <span class="q-num">{{ schoolResult }}</span>
+        <span class="q-text">students in {{ schoolQuery }}</span>
+      </div>
+    </div>
+
+    <!-- Query: Standard Count -->
+    <div class="card">
+      <div class="card-title">Standard Count Query</div>
+      <div class="query-row">
+        <input class="q-input" type="number" [(ngModel)]="stdQuery" placeholder="Standard..." min="1" max="12" />
+        <button class="q-btn" (click)="queryStandard()">Search</button>
+      </div>
+      <div class="q-result" *ngIf="stdResult !== null">
+        <span class="q-num">{{ stdResult }}</span>
+        <span class="q-text">students in Standard {{ stdQuery }}</span>
+      </div>
+    </div>
+
+    <!-- Query: Strength -->
+    <div class="card card--wide">
+      <div class="card-title">Gender × Standard Strength</div>
+      <div class="query-row">
+        <select class="q-input" [(ngModel)]="sgGender">
+          <option value="">Gender</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+          <option value="OTHER">Other</option>
+        </select>
+        <input class="q-input" type="number" [(ngModel)]="sgStd" placeholder="Standard" min="1" max="12" />
+        <button class="q-btn" (click)="queryStrength()">Search</button>
+      </div>
+      <div class="q-result" *ngIf="sgResult !== null">
+        <span class="q-num">{{ sgResult }}</span>
+        <span class="q-text">{{ sgGender }} students in Standard {{ sgStd }}</span>
+      </div>
+    </div>
+
+  </div>
+</div>

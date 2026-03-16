@@ -1,0 +1,77 @@
+<div class="form-page">
+  <div class="form-header">
+    <button class="back-btn" (click)="cancel()">← Back</button>
+    <h2>{{ isEdit ? 'Edit Student' : 'Add New Student' }}</h2>
+  </div>
+
+  <div class="loading-msg" *ngIf="loading">Loading...</div>
+
+  <div class="form-card" *ngIf="!loading" [formGroup]="form">
+
+    <div class="field-row">
+      <!-- Name -->
+      <div class="field">
+        <label>Full Name *</label>
+        <input type="text" formControlName="name" placeholder="e.g. Rahul Sharma" />
+        <span class="err" *ngIf="err('name')">Name is required (min 2 chars)</span>
+      </div>
+
+      <!-- Roll No -->
+      <div class="field">
+        <label>Roll Number *</label>
+        <input type="number" formControlName="rollNo" placeholder="e.g. 42" />
+        <span class="err" *ngIf="err('rollNo')">Valid roll number required</span>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <!-- Standard -->
+      <div class="field">
+        <label>Standard *</label>
+        <select formControlName="standard">
+          <option value="">Select Standard</option>
+          <option *ngFor="let s of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="s">
+            Standard {{ s }}
+          </option>
+        </select>
+        <span class="err" *ngIf="err('standard')">Standard is required</span>
+      </div>
+
+      <!-- School -->
+      <div class="field">
+        <label>School *</label>
+        <input type="text" formControlName="school" placeholder="e.g. KV, DPS" />
+        <span class="err" *ngIf="err('school')">School name is required</span>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <!-- Gender -->
+      <div class="field">
+        <label>Gender *</label>
+        <select formControlName="gender">
+          <option value="">Select Gender</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+          <option value="OTHER">Other</option>
+        </select>
+        <span class="err" *ngIf="err('gender')">Gender is required</span>
+      </div>
+
+      <!-- Percentage -->
+      <div class="field">
+        <label>Percentage *</label>
+        <input type="number" formControlName="percentage" placeholder="0 - 100" min="0" max="100" />
+        <span class="err" *ngIf="err('percentage')">Percentage must be 0–100</span>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-cancel" (click)="cancel()">Cancel</button>
+      <button class="btn-save" (click)="submit()" [disabled]="saving">
+        {{ saving ? 'Saving...' : (isEdit ? 'Update Student' : 'Add Student') }}
+      </button>
+    </div>
+
+  </div>
+</div>

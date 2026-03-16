@@ -1,0 +1,92 @@
+<div class="list-page">
+
+  <!-- Header -->
+  <div class="list-header">
+    <h2 class="list-title">All Students <span class="count">({{ filtered.length }})</span></h2>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <input
+      class="filter-input"
+      type="text"
+      placeholder="Search by name or reg no..."
+      [(ngModel)]="search"
+      (ngModelChange)="applyFilter()"
+    />
+    <select class="filter-select" [(ngModel)]="filterGender" (ngModelChange)="applyFilter()">
+      <option value="">All Genders</option>
+      <option value="MALE">Male</option>
+      <option value="FEMALE">Female</option>
+      <option value="OTHER">Other</option>
+    </select>
+    <select class="filter-select" [(ngModel)]="filterStandard" (ngModelChange)="applyFilter()">
+      <option value="">All Standards</option>
+      <option *ngFor="let s of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="s">Standard {{ s }}</option>
+    </select>
+    <button class="btn-clear" (click)="search=''; filterGender=''; filterStandard=''; applyFilter()">
+      Clear
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">Loading students...</div>
+
+  <!-- Table -->
+  <div class="table-card" *ngIf="!loading">
+    <table class="table" *ngIf="filtered.length; else empty">
+      <thead>
+        <tr>
+          <th>Reg No</th>
+          <th>Roll</th>
+          <th>Name</th>
+          <th>Standard</th>
+          <th>School</th>
+          <th>Gender</th>
+          <th>Percentage</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of filtered" class="table-row">
+          <td><span class="reg">{{ s.regNo }}</span></td>
+          <td>{{ s.rollNo }}</td>
+          <td class="name-col" (click)="goToDetail(s.regNo)">
+            {{ s.name }}
+          </td>
+          <td>Std {{ s.standard }}</td>
+          <td>{{ s.school }}</td>
+          <td>
+            <span class="badge badge--{{ s.gender.toLowerCase() }}">{{ s.gender }}</span>
+          </td>
+          <td>
+            <span class="pct" [class]="getPassClass(s.percentage)">{{ s.percentage }}%</span>
+          </td>
+          <td>
+            <div class="actions" (click)="$event.stopPropagation()">
+              <button class="btn-edit"   (click)="goToEdit(s.regNo, $event)">Edit</button>
+              <button class="btn-delete" (click)="askDelete(s, $event)">Delete</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #empty>
+      <div class="empty">No students found.</div>
+    </ng-template>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal-overlay" *ngIf="showConfirm">
+    <div class="modal">
+      <h3>Delete Student</h3>
+      <p>Are you sure you want to delete <strong>{{ deleteTarget?.name }}</strong>?</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+        <button class="btn-confirm-delete" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+</div>

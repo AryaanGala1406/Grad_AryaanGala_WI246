@@ -1,0 +1,279 @@
+.detail-page {
+  max-width: 800px;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.back-btn {
+  padding: 8px 14px;
+  border: 1px solid #e0e3eb;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  color: #6b7280;
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    background: #f4f6fb;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-edit,
+.btn-delete {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid;
+}
+
+.btn-edit {
+  background: #eff6ff;
+  color: #3b82f6;
+  border-color: #bfdbfe;
+
+  &:hover {
+    background: #3b82f6;
+    color: #fff;
+  }
+}
+
+.btn-delete {
+  background: #fef2f2;
+  color: #ef4444;
+  border-color: #fecaca;
+
+  &:hover {
+    background: #ef4444;
+    color: #fff;
+  }
+}
+
+.loading-msg {
+  text-align: center;
+  padding: 60px;
+  color: #9ca3af;
+}
+
+.detail-card {
+  background: #fff;
+  border: 1px solid #e8eaf0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.profile-top {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 32px;
+  background: linear-gradient(135deg, #f8f9fc, #eef2ff);
+  border-bottom: 1px solid #e8eaf0;
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.student-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-bottom: 4px;
+}
+
+.student-reg {
+  font-size: 12px;
+  font-family: monospace;
+  color: #9ca3af;
+  margin-bottom: 8px;
+}
+
+.gender-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+
+  &.badge--male {
+    background: #eff6ff;
+    color: #3b82f6;
+  }
+
+  &.badge--female {
+    background: #fdf2f8;
+    color: #ec4899;
+  }
+
+  &.badge--other {
+    background: #f5f3ff;
+    color: #8b5cf6;
+  }
+}
+
+.pct-display {
+  text-align: center;
+
+  .pct-num {
+    font-size: 36px;
+    font-weight: 800;
+
+    &.pct--pass {
+      color: #10b981;
+    }
+
+    &.pct--fail {
+      color: #ef4444;
+    }
+  }
+
+  .grade-tag {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+
+  .result-tag {
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+
+    &.pass {
+      background: #ecfdf5;
+      color: #065f46;
+    }
+
+    &.fail {
+      background: #fef2f2;
+      color: #991b1b;
+    }
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.info-item {
+  padding: 20px 24px;
+  border-right: 1px solid #f0f2f8;
+  border-bottom: 1px solid #f0f2f8;
+
+  &:nth-child(3n) {
+    border-right: none;
+  }
+
+  .info-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .info-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 32px;
+  width: 380px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #1a1a2e;
+  }
+
+  p {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 24px;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.btn-cancel {
+  height: 40px;
+  padding: 0 20px;
+  border: 1px solid #e0e3eb;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.btn-confirm-delete {
+  height: 40px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 8px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}

@@ -1,0 +1,74 @@
+<div class="detail-page">
+  <div class="detail-header">
+    <button class="back-btn" routerLink="/students">← All Students</button>
+    <div class="header-actions" *ngIf="student">
+      <button class="btn-edit"   (click)="edit()">Edit</button>
+      <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
+
+  <div class="loading-msg" *ngIf="loading">Loading...</div>
+
+  <div class="detail-card" *ngIf="!loading && student">
+    <div class="profile-top">
+      <div class="avatar">{{ getInitials(student.name) }}</div>
+      <div class="profile-info">
+        <h2 class="student-name">{{ student.name }}</h2>
+        <div class="student-reg">{{ student.regNo }}</div>
+        <span class="gender-badge badge--{{ student.gender.toLowerCase() }}">
+          {{ student.gender }}
+        </span>
+      </div>
+      <div class="pct-display">
+        <div class="pct-num" [class]="'pct--' + (student.percentage >= 40 ? 'pass' : 'fail')">
+          {{ student.percentage }}%
+        </div>
+        <div class="grade-tag">Grade {{ getGrade(student.percentage) }}</div>
+        <div class="result-tag" [class]="student.percentage >= 40 ? 'pass' : 'fail'">
+          {{ student.percentage >= 40 ? 'PASS' : 'FAIL' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">Roll Number</div>
+        <div class="info-value">{{ student.rollNo }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Standard</div>
+        <div class="info-value">Class {{ student.standard }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">School</div>
+        <div class="info-value">{{ student.school }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Gender</div>
+        <div class="info-value">{{ student.gender }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Percentage</div>
+        <div class="info-value">{{ student.percentage }}%</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Result</div>
+        <div class="info-value" [style.color]="student.percentage >= 40 ? '#10b981' : '#ef4444'">
+          {{ student.percentage >= 40 ? 'Passed' : 'Failed' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Modal -->
+  <div class="modal-overlay" *ngIf="showConfirm">
+    <div class="modal">
+      <h3>Delete Student?</h3>
+      <p>This will permanently remove <strong>{{ student?.name }}</strong>.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="showConfirm = false">Cancel</button>
+        <button class="btn-confirm-delete" (click)="doDelete()">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+<aside class="sidebar">
+  <div class="sidebar-logo">EduTrack</div>
+
+  <nav class="sidebar-nav">
+    <a
+      *ngFor="let link of links"
+      [routerLink]="link.route"
+      class="nav-link"
+      [class.active]="isActive(link.route)"
+    >
+      {{ link.label }}
+    </a>
+  </nav>
+</aside>
